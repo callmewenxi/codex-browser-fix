@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add a double-click Windows launcher that finds Codex's Node.js runtime, applies the patch, checks results, and supports restoration.
+- Document step-by-step Windows installation and the successful post-restart Chrome test.
 - Discover the extracted Windows computer-use runtime, including its browser-desktop and CUA browser-service copies.
 - Support Windows user-cache browser service discovery, patching, checking, and restoration.
 - Keep Windows patch state in `%USERPROFILE%\.codex-browser-windows-fix\` and run CLI coverage on Windows CI.

@@ -23,7 +23,7 @@ The related upstream report also describes `unsupported Codex auth method: apike
 
 | Component | Scope / evidence |
 | --- | --- |
-| Operating system | macOS and Windows; Windows source matching and CLI tested with Codex Desktop 26.924.22138 |
+| Operating system | macOS and Windows; Windows CLI and a live Chrome extension test succeeded with desktop 26.924.2738.0 and browser service 26.924.22138 after restarting Codex |
 | Intel Macs | No architecture-specific patch code, but not tested |
 | Linux | Not supported by this patcher |
 | Node.js | 20 or newer; Windows validation uses 24.19.0; no npm dependencies |
@@ -54,7 +54,30 @@ Before writing a patch, the script requires an unambiguous source match, checks 
 
 ## Installation and use
 
-Install Node.js 20+ from [nodejs.org](https://nodejs.org/) and configure the desktop app and its official browser extension first. This repository does not install either application or the extension.
+Configure the desktop app and its official browser extension first. This repository does not install either application or the extension. Test a harmless browser operation before patching; if it works, no patch is needed.
+
+### Windows: double-click install
+
+1. On this repository's GitHub page, choose **Code > Download ZIP** and extract the ZIP. Do not run the file from inside the ZIP preview.
+2. Open the extracted folder and double-click `install-windows.cmd`. The window stays open so you can read the result. It automatically uses Node.js from Codex's extracted runtime, or `node.exe` on your PATH. If neither exists, install Node.js 20+ from [nodejs.org](https://nodejs.org/) and try again.
+3. Confirm that every reported target says `patched` or `already`, followed by `Success`. A `no-match`, `unsupported`, or other failure means the fix was not fully applied; keep the window open and review the statuses.
+4. Completely close Codex, including any background instance, then reopen it and test Chrome or Edge through Codex. The file check alone does not prove the browser works.
+
+No administrator access or `npm install` is needed. The launcher does not modify the Chrome/Edge extension. Re-running it after a Codex update is safe in the sense that already-patched files are skipped; test browser use first because an update may already have fixed the issue.
+
+To undo the patch, open a terminal in the extracted folder, run `install-windows.cmd --restore`, then fully restart Codex. Restoration only writes an original when the recorded backup and current patched file have the expected hashes. Keep `%USERPROFILE%\.codex-browser-windows-fix\backups\` until restoration is complete.
+
+For a manual PowerShell install, open PowerShell in the extracted folder (File Explorer address bar: type `powershell` and press Enter), then run:
+
+```powershell
+.\install-windows.cmd
+```
+
+If the launcher cannot find Node.js, install Node.js 20+ and open a new PowerShell window. Running `node .\codex-browser-mac-fix.mjs` from another folder will fail with `MODULE_NOT_FOUND`; change to the extracted folder first or use the launcher, which locates its script automatically.
+
+### macOS and manual use
+
+Install Node.js 20+ from [nodejs.org](https://nodejs.org/) if it is not already available. Clone the repository into any ordinary directory:
 
 Clone the repository into any ordinary directory:
 
@@ -66,7 +89,7 @@ node codex-browser-mac-fix.mjs --help
 
 Alternatively, download and extract GitHub's source ZIP, then open a terminal in the extracted directory. No `npm install` is needed.
 
-Try listing tabs and opening/reading a harmless page through the extension. If that works, **do not apply the patch**. If the affected authentication error is reproducible, quit the desktop app, then run:
+If the affected authentication error is reproducible, quit the desktop app, then run:
 
 ```sh
 node codex-browser-mac-fix.mjs

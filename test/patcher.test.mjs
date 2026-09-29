@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import { buildHelperSource, patchSource, restoreFile } from "../codex-browser-mac-fix.mjs";
 
 const script = fileURLToPath(new URL("../codex-browser-mac-fix.mjs", import.meta.url));
+const windowsLauncher = fileURLToPath(new URL("../install-windows.cmd", import.meta.url));
 const fixture = "function fixture(){return new Client(r,this.clientApi,()=>metadata(this.runtime),this.turnEndedTracker,policy)}";
 const hash = (s) => crypto.createHash("sha256").update(s).digest("hex");
 function temporary(t) {
@@ -133,4 +134,29 @@ test("CLI discovers user-cache browser services and completes apply/check/restor
   assert.equal(restored.status, 0, restored.stderr);
   assert.equal(fs.readFileSync(service, "utf8"), fixture);
   if (process.platform === "win32") assert.equal(fs.readFileSync(runtimeService, "utf8"), fixture);
+});
+
+test("Windows launcher works from another working directory", { skip: process.platform !== "win32" }, (t) => {
+  const dir = temporary(t);
+  const bundle = path.join(dir, "extracted folder with spaces");
+  const codexHome = path.join(dir, "Codex cache");
+  fs.mkdirSync(bundle);
+  fs.copyFileSync(script, path.join(bundle, path.basename(script)));
+  fs.copyFileSync(windowsLauncher, path.join(bundle, path.basename(windowsLauncher)));
+  const service = path.join(codexHome, "plugins", "cache", "openai-bundled", "chrome", "test-version", "scripts", "browser-service.mjs");
+  fs.mkdirSync(path.dirname(service), { recursive: true });
+  fs.writeFileSync(service, fixture);
+  const env = { ...process.env, CODEX_HOME: codexHome, HOME: dir, USERPROFILE: dir,
+    LOCALAPPDATA: path.join(dir, "local-app-data"), CODEX_FIX_NO_PAUSE: "1",
+    PATH: `${path.dirname(process.execPath)};${process.env.PATH ?? ""}` };
+  const run = (...args) => spawnSync(process.env.ComSpec ?? "cmd.exe", ["/c", path.join(bundle, path.basename(windowsLauncher)), ...args], {
+    cwd: dir, env, encoding: "utf8",
+  });
+  const applied = run();
+  assert.equal(applied.status, 0, applied.stdout + applied.stderr);
+  assert.match(applied.stdout, /Success\./);
+  assert.equal(patchSource(fs.readFileSync(service, "utf8")).status, "already");
+  const restored = run("--restore");
+  assert.equal(restored.status, 0, restored.stdout + restored.stderr);
+  assert.equal(fs.readFileSync(service, "utf8"), fixture);
 });
