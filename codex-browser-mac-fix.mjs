@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * codex-browser-mac-fix — macOS port of the "local browser request
+ * codex-browser-mac-fix — macOS/Windows port of the "local browser request
  * identification" compatibility fix for Codex Desktop.
  *
  * Upstream reference: BigPizzaV3/CodexPlusPlus PR #2208 (Windows only).
@@ -45,7 +45,7 @@ import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
 const HOME = os.homedir();
-const FIX_DIR = path.join(HOME, ".codex-browser-mac-fix");
+const FIX_DIR = path.join(HOME, process.platform === "win32" ? ".codex-browser-windows-fix" : ".codex-browser-mac-fix");
 const BACKUP_DIR = path.join(FIX_DIR, "backups");
 const STATE_FILE = path.join(FIX_DIR, "state.json");
 const CONTROL_FILE = path.join(FIX_DIR, "control.json");
@@ -116,6 +116,7 @@ function sha256(text) {
 }
 
 function appVersion() {
+  if (process.platform !== "darwin") return "unknown";
   try {
     return execFileSync(
       "plutil",
@@ -307,15 +308,15 @@ function main() {
 Default: apply to discovered user-writable browser service files.
   --check                Inspect patch markers without changing files
   --restore              Restore only exact, recorded backups
-  --include-app-bundle   Include ChatGPT.app (invalidates its code signature)
+  --include-app-bundle   macOS only: include ChatGPT.app (invalidates its code signature)
   --file PATH            Explicit target; may be repeated
   --json                 Print a JSON report
   --help                 Show this help
 
-Requires macOS and Node.js 20 or newer. Test browser use before applying.`);
+Requires macOS or Windows and Node.js 20 or newer. Test browser use before applying.`);
     return;
   }
-  if (process.platform !== "darwin") throw new Error("This patcher supports macOS only.");
+  if (!["darwin", "win32"].includes(process.platform)) throw new Error("This patcher supports macOS and Windows only.");
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === "--file") {
       if (!argv[i + 1] || argv[i + 1].startsWith("--")) throw new Error("--file requires a path");
@@ -326,6 +327,7 @@ Requires macOS and Node.js 20 or newer. Test browser use before applying.`);
   }
   if (argv.includes("--check") && argv.includes("--restore")) throw new Error("Choose --check or --restore, not both.");
   const includeAppBundle = argv.includes("--include-app-bundle");
+  if (includeAppBundle && process.platform !== "darwin") throw new Error("--include-app-bundle is available on macOS only.");
   const explicitFiles = argv
     .map((value, index) => (value === "--file" ? argv[index + 1] : null))
     .filter(Boolean);

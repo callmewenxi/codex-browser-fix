@@ -92,7 +92,7 @@ test("restore requires the exact original and unchanged patched content", (t) =>
   assert.equal(restoreFile(file, state, dir).status, "already-original");
 });
 
-test("CLI reports missing targets and rejects invalid arguments", { skip: process.platform !== "darwin" }, (t) => {
+test("CLI reports missing targets and rejects invalid arguments", { skip: !["darwin", "win32"].includes(process.platform) }, (t) => {
   const dir = temporary(t);
   const run = (...args) => spawnSync(process.execPath, [script, ...args], {
     encoding: "utf8", env: { ...process.env, CODEX_HOME: dir },
@@ -103,5 +103,26 @@ test("CLI reports missing targets and rejects invalid arguments", { skip: proces
   assert.equal(run("--file").status, 2);
   assert.equal(run("--unknown").status, 2);
   assert.equal(run("--restore", "--check").status, 2);
+  if (process.platform === "win32") assert.equal(run("--include-app-bundle").status, 2);
   assert.equal(run("--help").status, 0);
+});
+
+test("CLI discovers user-cache browser services and completes apply/check/restore", { skip: !["darwin", "win32"].includes(process.platform) }, (t) => {
+  const dir = temporary(t);
+  const service = path.join(dir, "plugins", "cache", "openai-bundled", "chrome", "test-version", "scripts", "browser-service.mjs");
+  fs.mkdirSync(path.dirname(service), { recursive: true });
+  fs.writeFileSync(service, fixture);
+  const run = (...args) => spawnSync(process.execPath, [script, ...args, "--json"], {
+    encoding: "utf8", env: { ...process.env, CODEX_HOME: dir, HOME: dir, USERPROFILE: dir },
+  });
+  const before = run("--check");
+  assert.equal(before.status, 1, before.stderr);
+  assert.equal(JSON.parse(before.stdout).results[0].status, "unpatched");
+  const applied = run();
+  assert.equal(applied.status, 0, applied.stderr);
+  assert.equal(JSON.parse(applied.stdout).results[0].status, "patched");
+  assert.equal(run("--check").status, 0);
+  const restored = run("--restore");
+  assert.equal(restored.status, 0, restored.stderr);
+  assert.equal(fs.readFileSync(service, "utf8"), fixture);
 });

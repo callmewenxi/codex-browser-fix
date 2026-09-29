@@ -3,7 +3,7 @@
 [![Tests](https://github.com/callmewenxi/codex-browser-mac-fix/actions/workflows/test.yml/badge.svg)](https://github.com/callmewenxi/codex-browser-mac-fix/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-An experimental macOS compatibility patch for the browser service used by Codex Desktop with the Chrome/Edge extension and an API key or custom model provider.
+An experimental macOS and Windows compatibility patch for the browser service used by Codex Desktop with the Chrome/Edge extension and an API key or custom model provider.
 
 **Test browser operations before applying this patch.** On the author's current installation, desktop version `26.917.71314` works without this patch. An absent patch marker does not mean your browser is broken.
 
@@ -23,10 +23,10 @@ The related upstream report also describes `unsupported Codex auth method: apike
 
 | Component | Scope / evidence |
 | --- | --- |
-| Operating system | macOS only; current checks and tests run on macOS 26.6.2 (25G83), Apple Silicon / arm64 |
+| Operating system | macOS and Windows; Windows source matching and CLI tested with Codex Desktop 26.924.22138 |
 | Intel Macs | No architecture-specific patch code, but not tested |
-| Windows / Linux | Not supported by this patcher |
-| Node.js | 20 or newer; local validation uses 20.20.0; no npm dependencies |
+| Linux | Not supported by this patcher |
+| Node.js | 20 or newer; Windows validation uses 24.19.0; no npm dependencies |
 | Desktop 26.915.31945 | Historical local record reports the auth error before patching and successful Chrome tab listing after patching and resetting the browser runtime |
 | Chrome extension 1.26.901.11451_0 | Extension version in that historical verification record |
 | Desktop 26.917.71314 | On 2026-09-24, discovery found four unpatched user-cache service files. A live Chrome extension test successfully created, listed, read, refreshed, and closed an example.com tab without reapplying the patch |
@@ -73,7 +73,7 @@ node codex-browser-mac-fix.mjs
 node codex-browser-mac-fix.mjs --check
 ```
 
-Restart the desktop app and test real browser operations again. Default targets are under the current user's `~/.codex/` and normally require no `sudo`.
+Restart the desktop app and test real browser operations again. Default targets are under the current user's `~/.codex/` (Windows: `%USERPROFILE%\.codex\`) and normally require no elevated permissions.
 
 ### Target discovery
 
@@ -86,7 +86,7 @@ The patcher searches the following locations for `scripts/browser-service.mjs`:
 
 ### Local data and directory placement
 
-The repository and script can live anywhere. Runtime data is always written to:
+The repository and script can live anywhere. Runtime data is written to `~/.codex-browser-mac-fix/` on macOS or `%USERPROFILE%\.codex-browser-windows-fix\` on Windows:
 
 ```text
 ~/.codex-browser-mac-fix/
@@ -95,7 +95,7 @@ The repository and script can live anywhere. Runtime data is always written to:
   backups/       # Originals needed for restoration
 ```
 
-The leading dot only makes the directory hidden by the normal macOS/Unix convention. It is not encryption. The control file's absolute path is embedded in patched service files, so keep this data directory in place while using the patch. Do not share its contents or copy it between machines.
+The leading dot makes the directory hidden by the normal macOS/Unix convention, but not on Windows. It is not encryption. The control file's absolute path is embedded in patched service files, so keep this data directory in place while using the patch. Do not share its contents or copy it between machines.
 
 Default control file:
 
@@ -117,7 +117,7 @@ Restart the app afterward. Restore requires a recorded state entry, an unchanged
 
 ### Optional app-bundle patching
 
-`--include-app-bundle` additionally targets two known browser-service copies inside `/Applications/ChatGPT.app/Contents/Resources/cua_node/`. These are associated with the unified computer-use browser backend in the inspected layout.
+On macOS only, `--include-app-bundle` additionally targets two known browser-service copies inside `/Applications/ChatGPT.app/Contents/Resources/cua_node/`. These are associated with the unified computer-use browser backend in the inspected layout. Windows discovery is limited to the user plugin cache; use `--file` for an explicitly inspected alternative copy.
 
 **This invalidates the app's code signature and can affect Gatekeeper checks or macOS privacy permissions.** It is not the default or recommended first step. The default patch does not edit the app bundle, desktop accessibility backend, or in-app browser implementation. If you deliberately used this option, also include it when checking or restoring:
 
@@ -149,12 +149,12 @@ node codex-browser-mac-fix.mjs --check --json
 npm test
 ```
 
-Tests use temporary files and synthetic JavaScript, never your installed service or real patch state. GitHub Actions runs the suite on macOS with Node.js 20 and 22.
+Tests use temporary files and synthetic JavaScript, never your installed service or real patch state. GitHub Actions runs the suite on macOS and Windows with Node.js 20 and 22.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for useful bug-report details. Do not upload authentication files, tokens, browser history, personal state files, or vendor runtime backups.
 
 ## Attribution and license
 
-Inspired by the Windows request-identification compatibility approach in [BigPizzaV3/CodexPlusPlus PR #2208](https://github.com/BigPizzaV3/CodexPlusPlus/pull/2208). This small macOS implementation does not provide that project's complete fingerprint validation, lifecycle management, or Windows adapter.
+Inspired by the Windows request-identification compatibility approach in [BigPizzaV3/CodexPlusPlus PR #2208](https://github.com/BigPizzaV3/CodexPlusPlus/pull/2208). This implementation does not provide that project's complete fingerprint validation or lifecycle management.
 
 Repository code is released under the [MIT License](LICENSE). Third-party applications and extensions remain subject to their own licenses and terms.

@@ -2,7 +2,7 @@
 
 Open an issue before proposing support for a new runtime layout. Include:
 
-- macOS version and CPU architecture.
+- Operating system/version and CPU architecture.
 - Desktop app version, installation name/path, and extension version.
 - Browser family and whether authentication uses ChatGPT login, an API key, or a custom provider. Never include credentials or provider secrets.
 - The exact error, whether it happens without the patch, and minimal reproduction steps.

@@ -2,7 +2,7 @@
   "name": "codex-browser-mac-fix",
   "version": "0.1.0",
   "private": true,
-  "description": "Experimental macOS browser request-identification compatibility patch for Codex Desktop.",
+  "description": "Experimental macOS and Windows browser request-identification compatibility patch for Codex Desktop.",
   "type": "module",
   "license": "MIT",
   "engines": { "node": ">=20" },

@@ -6,9 +6,10 @@ permissions:
   contents: read
 jobs:
   test:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [macos-latest, windows-latest]
         node: [20, 22]
     steps:
       - uses: actions/checkout@v4

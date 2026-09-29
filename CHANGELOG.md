@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Support Windows user-cache browser service discovery, patching, checking, and restoration.
+- Keep Windows patch state in `%USERPROFILE%\.codex-browser-windows-fix\` and run CLI coverage on Windows CI.
+
 ## 0.1.0 - 2026-09-24
 
 Initial public experimental release.
