@@ -81,6 +81,7 @@ The patcher searches the following locations for `scripts/browser-service.mjs`:
 
 - `$CODEX_HOME/plugins/cache/openai-bundled/`
 - `$CODEX_HOME/.tmp/bundled-marketplaces/openai-bundled/plugins/`
+- On Windows, `%LOCALAPPDATA%\OpenAI\Codex\runtimes\cua_node\*\bin\node_modules\@oai\browser-desktop\` and `@oai\cua\` browser-service copies
 
 `CODEX_HOME` defaults to `~/.codex`. Only the known directory depths are searched; newer layouts may need code changes. Advanced users can supply an explicit file with `--file /absolute/path/to/browser-service.mjs`, repeated for multiple targets.
 
@@ -117,7 +118,7 @@ Restart the app afterward. Restore requires a recorded state entry, an unchanged
 
 ### Optional app-bundle patching
 
-On macOS only, `--include-app-bundle` additionally targets two known browser-service copies inside `/Applications/ChatGPT.app/Contents/Resources/cua_node/`. These are associated with the unified computer-use browser backend in the inspected layout. Windows discovery is limited to the user plugin cache; use `--file` for an explicitly inspected alternative copy.
+On macOS only, `--include-app-bundle` additionally targets two known browser-service copies inside `/Applications/ChatGPT.app/Contents/Resources/cua_node/`. These are associated with the unified computer-use browser backend in the inspected layout. On Windows, the user-writable extracted runtime copies are included by default; packaged files under `WindowsApps` are not modified.
 
 **This invalidates the app's code signature and can affect Gatekeeper checks or macOS privacy permissions.** It is not the default or recommended first step. The default patch does not edit the app bundle, desktop accessibility backend, or in-app browser implementation. If you deliberately used this option, also include it when checking or restoring:
 

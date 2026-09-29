@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Discover the extracted Windows computer-use runtime, including its browser-desktop and CUA browser-service copies.
 - Support Windows user-cache browser service discovery, patching, checking, and restoration.
 - Keep Windows patch state in `%USERPROFILE%\.codex-browser-windows-fix\` and run CLI coverage on Windows CI.
 

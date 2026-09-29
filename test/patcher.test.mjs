@@ -95,7 +95,7 @@ test("restore requires the exact original and unchanged patched content", (t) =>
 test("CLI reports missing targets and rejects invalid arguments", { skip: !["darwin", "win32"].includes(process.platform) }, (t) => {
   const dir = temporary(t);
   const run = (...args) => spawnSync(process.execPath, [script, ...args], {
-    encoding: "utf8", env: { ...process.env, CODEX_HOME: dir },
+    encoding: "utf8", env: { ...process.env, CODEX_HOME: dir, LOCALAPPDATA: dir },
   });
   const empty = run("--check", "--json");
   assert.equal(empty.status, 2);
@@ -109,11 +109,17 @@ test("CLI reports missing targets and rejects invalid arguments", { skip: !["dar
 
 test("CLI discovers user-cache browser services and completes apply/check/restore", { skip: !["darwin", "win32"].includes(process.platform) }, (t) => {
   const dir = temporary(t);
+  const localAppData = path.join(dir, "local-app-data");
   const service = path.join(dir, "plugins", "cache", "openai-bundled", "chrome", "test-version", "scripts", "browser-service.mjs");
   fs.mkdirSync(path.dirname(service), { recursive: true });
   fs.writeFileSync(service, fixture);
+  const runtimeService = path.join(localAppData, "OpenAI", "Codex", "runtimes", "cua_node", "test-version", "bin", "node_modules", "@oai", "browser-desktop", "scripts", "browser-service.mjs");
+  if (process.platform === "win32") {
+    fs.mkdirSync(path.dirname(runtimeService), { recursive: true });
+    fs.writeFileSync(runtimeService, fixture);
+  }
   const run = (...args) => spawnSync(process.execPath, [script, ...args, "--json"], {
-    encoding: "utf8", env: { ...process.env, CODEX_HOME: dir, HOME: dir, USERPROFILE: dir },
+    encoding: "utf8", env: { ...process.env, CODEX_HOME: dir, HOME: dir, USERPROFILE: dir, LOCALAPPDATA: localAppData },
   });
   const before = run("--check");
   assert.equal(before.status, 1, before.stderr);
@@ -121,8 +127,10 @@ test("CLI discovers user-cache browser services and completes apply/check/restor
   const applied = run();
   assert.equal(applied.status, 0, applied.stderr);
   assert.equal(JSON.parse(applied.stdout).results[0].status, "patched");
+  if (process.platform === "win32") assert.equal(JSON.parse(applied.stdout).results.length, 2);
   assert.equal(run("--check").status, 0);
   const restored = run("--restore");
   assert.equal(restored.status, 0, restored.stderr);
   assert.equal(fs.readFileSync(service, "utf8"), fixture);
+  if (process.platform === "win32") assert.equal(fs.readFileSync(runtimeService, "utf8"), fixture);
 });

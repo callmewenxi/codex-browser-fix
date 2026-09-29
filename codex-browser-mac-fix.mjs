@@ -158,6 +158,21 @@ function discoverTargets({ includeAppBundle }) {
       }
     }
   }
+  if (process.platform === "win32") {
+    const localAppData = process.env.LOCALAPPDATA || path.join(HOME, "AppData", "Local");
+    const runtimeRoot = path.join(localAppData, "OpenAI", "Codex", "runtimes", "cua_node");
+    const runtimePaths = [
+      "@oai/browser-desktop/scripts/browser-service.mjs",
+      "@oai/cua/dist/lib/js/oai_js_browser/dist/skill/scripts/browser-service.mjs",
+    ];
+    for (const version of listDir(runtimeRoot)) {
+      if (!version.isDirectory()) continue;
+      for (const relative of runtimePaths) {
+        const candidate = path.join(runtimeRoot, version.name, "bin", "node_modules", relative);
+        if (fs.existsSync(candidate)) found.add(candidate);
+      }
+    }
+  }
   if (includeAppBundle) {
     for (const candidate of APP_BUNDLE_TARGETS) {
       if (fs.existsSync(candidate)) found.add(candidate);
