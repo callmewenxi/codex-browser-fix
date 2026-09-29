@@ -1,6 +1,6 @@
-# codex-browser-mac-fix
+# codex-browser-fix
 
-[![Tests](https://github.com/callmewenxi/codex-browser-mac-fix/actions/workflows/test.yml/badge.svg)](https://github.com/callmewenxi/codex-browser-mac-fix/actions/workflows/test.yml)
+[![Tests](https://github.com/callmewenxi/codex-browser-fix/actions/workflows/test.yml/badge.svg)](https://github.com/callmewenxi/codex-browser-fix/actions/workflows/test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 An experimental macOS and Windows compatibility patch for the browser service used by Codex Desktop with the Chrome/Edge extension and an API key or custom model provider.
@@ -73,7 +73,7 @@ For a manual PowerShell install, open PowerShell in the extracted folder (File E
 .\install-windows.cmd
 ```
 
-If the launcher cannot find Node.js, install Node.js 20+ and open a new PowerShell window. Running `node .\codex-browser-mac-fix.mjs` from another folder will fail with `MODULE_NOT_FOUND`; change to the extracted folder first or use the launcher, which locates its script automatically.
+If the launcher cannot find Node.js, install Node.js 20+ and open a new PowerShell window. Running `node .\codex-browser-fix.mjs` from another folder will fail with `MODULE_NOT_FOUND`; change to the extracted folder first or use the launcher, which locates its script automatically.
 
 ### macOS and manual use
 
@@ -82,9 +82,9 @@ Install Node.js 20+ from [nodejs.org](https://nodejs.org/) if it is not already 
 Clone the repository into any ordinary directory:
 
 ```sh
-git clone https://github.com/callmewenxi/codex-browser-mac-fix.git
-cd codex-browser-mac-fix
-node codex-browser-mac-fix.mjs --help
+git clone https://github.com/callmewenxi/codex-browser-fix.git
+cd codex-browser-fix
+node codex-browser-fix.mjs --help
 ```
 
 Alternatively, download and extract GitHub's source ZIP, then open a terminal in the extracted directory. No `npm install` is needed.
@@ -92,8 +92,8 @@ Alternatively, download and extract GitHub's source ZIP, then open a terminal in
 If the affected authentication error is reproducible, quit the desktop app, then run:
 
 ```sh
-node codex-browser-mac-fix.mjs
-node codex-browser-mac-fix.mjs --check
+node codex-browser-fix.mjs
+node codex-browser-fix.mjs --check
 ```
 
 Restart the desktop app and test real browser operations again. Default targets are under the current user's `~/.codex/` (Windows: `%USERPROFILE%\.codex\`) and normally require no elevated permissions.
@@ -110,7 +110,7 @@ The patcher searches the following locations for `scripts/browser-service.mjs`:
 
 ### Local data and directory placement
 
-The repository and script can live anywhere. Runtime data is written to `~/.codex-browser-mac-fix/` on macOS or `%USERPROFILE%\.codex-browser-windows-fix\` on Windows:
+The repository and script can live anywhere. For compatibility with existing installations, runtime data stays in the original `~/.codex-browser-mac-fix/` directory on macOS or `%USERPROFILE%\.codex-browser-windows-fix\` on Windows:
 
 ```text
 ~/.codex-browser-mac-fix/
@@ -134,7 +134,7 @@ Setting the flag to `false` hands the decision back to the vendor callback; it d
 Quit the desktop app, then run from the repository directory:
 
 ```sh
-node codex-browser-mac-fix.mjs --restore
+node codex-browser-fix.mjs --restore
 ```
 
 Restart the app afterward. Restore requires a recorded state entry, an unchanged patched-file hash, and an exact original-backup hash. It refuses unknown or modified files instead of guessing another version's backup. Keep the data directory until every intended target has been restored. There is no background daemon or scheduled task to uninstall.
@@ -146,7 +146,7 @@ On macOS only, `--include-app-bundle` additionally targets two known browser-ser
 **This invalidates the app's code signature and can affect Gatekeeper checks or macOS privacy permissions.** It is not the default or recommended first step. The default patch does not edit the app bundle, desktop accessibility backend, or in-app browser implementation. If you deliberately used this option, also include it when checking or restoring:
 
 ```sh
-node codex-browser-mac-fix.mjs --restore --include-app-bundle
+node codex-browser-fix.mjs --restore --include-app-bundle
 ```
 
 Do not disable macOS security protections to accommodate the patch. Restoring the exact original resources can repair a signature seal broken only by those resource edits; unrelated changes are outside this tool's scope.
@@ -156,7 +156,7 @@ Do not disable macOS security protections to accommodate the patch. Restoring th
 Desktop updates may overwrite the patch. Test browser operations again before deciding to reapply. Do not restore an old runtime over a new version. `--check` examines source markers only; it does not test authentication, control-file contents, the loaded worker, or browser functionality.
 
 ```sh
-node codex-browser-mac-fix.mjs --check --json
+node codex-browser-fix.mjs --check --json
 ```
 
 | Exit code | Meaning |

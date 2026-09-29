@@ -1,5 +1,5 @@
 {
-  "name": "codex-browser-mac-fix",
+  "name": "codex-browser-fix",
   "version": "0.1.0",
   "private": true,
   "description": "Experimental macOS and Windows browser request-identification compatibility patch for Codex Desktop.",

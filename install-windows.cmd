@@ -30,13 +30,13 @@ if not "%~1"=="" (
 )
 
 echo Applying browser fix...
-"%NODE_EXE%" "%~dp0codex-browser-mac-fix.mjs"
+"%NODE_EXE%" "%~dp0codex-browser-fix.mjs"
 if errorlevel 1 (
   set "RESULT=1"
   goto finish
 )
 echo Checking patched files...
-"%NODE_EXE%" "%~dp0codex-browser-mac-fix.mjs" --check
+"%NODE_EXE%" "%~dp0codex-browser-fix.mjs" --check
 if errorlevel 1 (
   set "RESULT=1"
   goto finish
@@ -48,7 +48,7 @@ goto finish
 
 :restore
 echo Restoring original browser service files...
-"%NODE_EXE%" "%~dp0codex-browser-mac-fix.mjs" --restore
+"%NODE_EXE%" "%~dp0codex-browser-fix.mjs" --restore
 if errorlevel 1 (
   set "RESULT=1"
   goto finish

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Rename the repository, package, and main script to `codex-browser-fix`, while preserving existing patch state and backups.
 - Add a double-click Windows launcher that finds Codex's Node.js runtime, applies the patch, checks results, and supports restoration.
 - Document step-by-step Windows installation and the successful post-restart Chrome test.
 - Discover the extracted Windows computer-use runtime, including its browser-desktop and CUA browser-service copies.

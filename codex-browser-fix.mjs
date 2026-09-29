@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * codex-browser-mac-fix — macOS/Windows port of the "local browser request
+ * codex-browser-fix - macOS/Windows port of the "local browser request
  * identification" compatibility fix for Codex Desktop.
  *
  * Upstream reference: BigPizzaV3/CodexPlusPlus PR #2208 (Windows only).
@@ -29,10 +29,10 @@
  *
  * Usage
  * -----
- *   node codex-browser-mac-fix.mjs                  # apply (user-writable copies)
- *   node codex-browser-mac-fix.mjs --check          # report drift, exit 1 if unpatched
- *   node codex-browser-mac-fix.mjs --restore        # restore original files
- *   node codex-browser-mac-fix.mjs --include-app-bundle   # also patch inside ChatGPT.app
+ *   node codex-browser-fix.mjs                  # apply (user-writable copies)
+ *   node codex-browser-fix.mjs --check          # report drift, exit 1 if unpatched
+ *   node codex-browser-fix.mjs --restore        # restore original files
+ *   node codex-browser-fix.mjs --include-app-bundle   # also patch inside ChatGPT.app
  *
  * Updates may replace these files. Test browser use before deciding to reapply.
  */
@@ -82,7 +82,7 @@ export function buildHelperSource(controlFile = CONTROL_FILE) {
   const controlLiteral = JSON.stringify(controlFile);
   return `
 import * as __cppFsp from "node:fs/promises";
-/* codex-browser-mac-fix: local request-identification reader (see ~/.codex-browser-mac-fix) */
+/* codex-browser-fix: local request-identification reader (legacy state directory) */
 function ${MARKER}(getTurnMetadata,fallback){
   return async function(){
     try{
@@ -211,7 +211,7 @@ export function patchSource(source) {
 
 /** Parse the candidate with Node before it is allowed to replace a live file. */
 function parses(source) {
-  const probeDir = fs.mkdtempSync(path.join(os.tmpdir(), "codex-browser-mac-fix-"));
+  const probeDir = fs.mkdtempSync(path.join(os.tmpdir(), "codex-browser-fix-"));
   const probe = path.join(probeDir, "probe.mjs");
   try {
     fs.writeFileSync(probe, source);
@@ -318,7 +318,7 @@ function classify(file) {
 function main() {
   const argv = process.argv.slice(2);
   if (argv.includes("--help")) {
-    console.log(`Usage: node codex-browser-mac-fix.mjs [options]
+    console.log(`Usage: node codex-browser-fix.mjs [options]
 
 Default: apply to discovered user-writable browser service files.
   --check                Inspect patch markers without changing files

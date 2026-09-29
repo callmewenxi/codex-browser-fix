@@ -6,9 +6,9 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { buildHelperSource, patchSource, restoreFile } from "../codex-browser-mac-fix.mjs";
+import { buildHelperSource, patchSource, restoreFile } from "../codex-browser-fix.mjs";
 
-const script = fileURLToPath(new URL("../codex-browser-mac-fix.mjs", import.meta.url));
+const script = fileURLToPath(new URL("../codex-browser-fix.mjs", import.meta.url));
 const windowsLauncher = fileURLToPath(new URL("../install-windows.cmd", import.meta.url));
 const fixture = "function fixture(){return new Client(r,this.clientApi,()=>metadata(this.runtime),this.turnEndedTracker,policy)}";
 const hash = (s) => crypto.createHash("sha256").update(s).digest("hex");
