@@ -5,7 +5,7 @@
 
 An experimental macOS and Windows compatibility patch for the browser service used by Codex Desktop with the Chrome/Edge extension and an API key or custom model provider.
 
-**Test browser operations before applying this patch.** On the author's current installation, desktop version `26.917.71314` works without this patch. An absent patch marker does not mean your browser is broken.
+**The author's successful Chrome verification was performed on an installation that had already been patched.** It is not evidence that desktop version `26.917.71314` works without this patch. Test browser operations before applying the patch, but do not infer an unpatched runtime from missing markers in discovered files alone.
 
 This is an independent, unofficial project, not affiliated with or endorsed by OpenAI, Google, or Microsoft. It modifies local desktop runtime files, not the installed Chrome extension. No vendor runtime, extension package, credentials, or personal backups are distributed.
 
@@ -29,11 +29,11 @@ The related upstream report also describes `unsupported Codex auth method: apike
 | Node.js | 20 or newer; Windows validation uses 24.19.0; no npm dependencies |
 | Desktop 26.915.31945 | Historical local record reports the auth error before patching and successful Chrome tab listing after patching and resetting the browser runtime |
 | Chrome extension 1.26.901.11451_0 | Extension version in that historical verification record |
-| Desktop 26.917.71314 | On 2026-09-24, discovery found four unpatched user-cache service files. A live Chrome extension test successfully created, listed, read, refreshed, and closed an example.com tab without reapplying the patch |
+| Desktop 26.917.71314 | On 2026-09-24, a live Chrome extension test successfully created, listed, read, refreshed, and closed an example.com tab on the author's previously patched installation. Four discovered user-cache service files lacked patch markers, but the loaded service and retained runtime/extension state were not established as unpatched |
 | Edge | Stable extension ID recognized by the code; no local end-to-end Edge verification |
 | Other / future desktop versions | Unverified; directory layout and minified code can change |
 
-The historical record is not a new reproduction on the old desktop version. The newer successful test does not establish whether the vendor fixed the issue or another local condition changed. The release's automated tests exercise synthetic fixtures and policy decisions, not full vendor runtime behavior.
+The historical record is not a new reproduction on the old desktop version. The `26.917.71314` test did not restore the previous patch and verify a clean, unpatched runtime before testing. "Without reapplying the patch" does not mean "without the patch." That result does not establish that the vendor fixed the issue or that the patch is unnecessary. The release's automated tests exercise synthetic fixtures and policy decisions, not full vendor runtime behavior.
 
 The local desktop app is named `ChatGPT.app`, while its browser integration and this repository refer to Codex Desktop. The optional app-bundle path is specifically `/Applications/ChatGPT.app`; renamed or differently installed applications are not automatically discovered.
 
@@ -54,7 +54,7 @@ Before writing a patch, the script requires an unambiguous source match, checks 
 
 ## Installation and use
 
-Configure the desktop app and its official browser extension first. This repository does not install either application or the extension. Test a harmless browser operation before patching; if it works, no patch is needed.
+Configure the desktop app and its official browser extension first. This repository does not install either application or the extension. Test a harmless browser operation before patching; if it already works, no additional patching is needed for that installation. If the installation was patched previously, success alone does not show that an unpatched installation would work.
 
 ### Windows: double-click install
 
